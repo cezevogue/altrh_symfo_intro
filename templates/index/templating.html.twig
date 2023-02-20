@@ -1,0 +1,165 @@
+{% extends 'base.html.twig' %}
+{# on rappelle systématiquement notre gabarit dont on hérite #}
+
+
+{# surcharge (ré-écriture) du bloc body défini dans base.html.twig #}
+{% block body %}
+    <h1>Templating avec TWIG</h1>
+
+    {#  les directives {% %} en twig sont fonctionnelles alors les directives {{ }} sont des directives d'affichage    #}
+
+    {# création d'une variable en twig #}
+    {% set maVar='contenu de ma variable' %}
+
+    {# affichage de la variable #}
+    <p>{{ maVar }}</p>
+
+    {# concaténation avec le tilde ~ #}
+    <p>{{ maVar ~ '!!!!!' }}</p>
+
+    {# structure conditionnelle #}
+    {% if maVar != '' %}
+        <p>maVar n'est pas vide</p>
+    {% else %}
+        <p>maVar est vide</p>
+    {% endif %}
+
+    {% set vrai= true %}
+    {% set faux= false %}
+
+    {# not en toute lettres : ! #}
+    {% if not faux %}
+        <p>faux n'est pas vrai</p>
+    {% endif %}
+
+    {# and et or en toutes lettres : if($vrai && !$faux) #}
+    {% if vrai and not faux %}
+        <p> vrai est true et faux n'est pas true</p>
+    {% endif %}
+
+    {# un tableau indexé: #}
+    {% set tableau= ['a', 'b', 'c', 'd'] %}
+
+    {# pour accéder à un élément du tableau #}
+    {{ tableau[2] }} {# c #}
+    {# ou bien #}
+    <br>
+    {{ tableau.2 }}
+    <br>
+
+    {# equivalent du var_dump #}
+    {{ dump(tableau) }}
+
+    {# foreach($tableau as $lettre) #}
+    {% for lettre in tableau %}
+        {{ lettre }}<br>
+    {% endfor %}
+
+    {# tableau associatif #}
+    {% set assoc= {nom:'Marc', prenom: 'Dupuis', profession: 'Poissonnier'} %}
+
+    {# accéder à un élément du tableau #}
+    {{ assoc['prenom'] }} <br>
+    {# ou bien #}
+    {{ assoc.prenom }} <br>
+
+    {# foreach($assoc as $key => $value) #}
+    {% for key, value in assoc %}
+        {{ key }}: {{ value }} <br>
+    {% endfor %}
+
+    {% set vide= [] %}
+
+    {# lancer un affichage si un tableau est vide #}
+    {% for element in vide %}
+        <p>{{ element }}</p>
+    {% else %}
+        <p>le tableau est vide</p>
+    {% endfor %}
+
+    {#  loop est disponible dans toutes les boucles et qui donne l'information sur l'état de la boucle  #}
+    {% for value in assoc %}
+        compteur de tour (1 pour le 1er tour) : {{ loop.index }}<br>
+        compteur de tour (0 pour le 1er tour) : {{ loop.index0 }}<br>
+
+        {% if loop.first %}
+            1er tour de boucle <br>
+        {% endif %}
+
+        {% if loop.last %}
+            dernier tour de boucle <br>
+        {% endif %}
+
+    {% endfor %}
+
+
+    {# for($i=0; $i<=10; $i++) #}
+    {% for i in 0..10 %}
+        {% if loop.last %}
+            {{ i }}.
+        {% else %}
+            {{ i }},
+        {% endif %}
+    {% endfor %}
+
+
+    {#  is et  is not #}
+
+   {# if(isset(maVar))#}
+    {% if maVar is defined %}
+        <p>maVar existe</p>
+    {% endif %}
+
+    {# if(!empty(maVar)) #}
+    {% if maVar is not empty %}
+        <p>maVar n'est pas vide</p>
+    {% endif %}
+
+
+    {# Filltres avec pipe | #}
+
+    {# strtoupper et son inverse lower #}
+    {{ maVar | upper }}
+
+   {% set var='' %}
+    <br>
+    {# valeur par defaut pour une variable vide (empty) #}
+    {{ var | default('La variable est vide') }}
+    <br>
+    {#  on peut cumuler les filtres #}
+    {{ var | default('La variable est vide') | upper }}
+
+    {# formatage de date #}
+    <p>{{ '2023-02-20' | date('d/m/Y') }}</p>
+    <p>{{ 'now' | date('d/m/Y') }}</p>
+
+    {# formatage sur date depuis un objet datetime => obligatoire de le formater
+     date_demain proviens d'un objet Datetime passé dans le controleur sur le tableau en 2nd paramètre de render
+    #}
+    <p>{{ date_demain | date('d/m/Y') }}</p>
+
+    {# appel de la methode format sur l'objet Datetime #}
+    <p>{{ date_demain.format('d-m-Y H:i:s') }}</p>
+
+    {% set paragraphe='<p>un paragraphe</p>' %}
+
+    {# par défaut le HTML est échappé en entité HTML #}
+    {{ paragraphe }}
+
+    {# le HTML n'est plus échappé #}
+    {{ paragraphe | raw }}
+
+    {# inclusion de fichier avec 'include'  #}
+    {% include 'index/inclus.html.twig' %}
+    {# cf: only ou with pour controller les acces aux contenus entre les fichier inclus et les fichiers demandant l'inclusion   => docu symfony.twig.com #}
+
+    {# la fonction path() => crée l'url de la route dont on lui donne le nom #}
+    <a href="{{ path('app_index') }}">Liens vers l'accueil</a>
+
+
+{% endblock %}
+
+  {% block title %}
+     {# {{ parent() }} reprend le contenu du bloc de 'base.html.twig' #}
+      {{ parent() }} | Templating
+  {% endblock %}
